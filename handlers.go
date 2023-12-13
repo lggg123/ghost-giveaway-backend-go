@@ -4,6 +4,8 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/lggg123/ghost-giveaway-backend-go/database"
 )
 
 func signupHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +17,7 @@ func signupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Save the user to the database
-	if err := db.Create(&user).Error; err != nil {
+	if err := database.DB.Create(&user).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
