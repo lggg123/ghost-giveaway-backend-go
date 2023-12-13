@@ -53,21 +53,16 @@ func CloseDB() {
 	sqlDB.Close()
 }
 
-// MigrateDB performs database migrations
 func MigrateDB() {
 	// Perform your database migrations here
-	_, err := DB.Exec(`
-		CREATE TABLE users (
-			id SERIAL PRIMARY KEY,
-			username VARCHAR(255),
-			email VARCHAR(255),
-			password VARCHAR(255)
-		);
-	`)
-
-	if err != nil {
-		log.Fatal(err)
+	models := []interface{}{
+		&User{},
+		// Add other models as needed
 	}
 
-	log.Println("Database migration completed")
+	// AutoMigrate all registered models
+	if err := DB.AutoMigrate(models...); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Database migration completed!")
 }
