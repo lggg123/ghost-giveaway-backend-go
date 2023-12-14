@@ -4,8 +4,11 @@ package database
 import (
 	"fmt"
 	"log"
+	"net/url"
+	"os"
 
 	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -14,18 +17,31 @@ var DB *gorm.DB
 
 // InitDB initializes the database connection
 func InitDB() {
+	viper.SetConfigFile(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal("Error reading .env file")
+	}
 
-	host := "postgres"
-	port := 5432
-	user := "postgres"
-	password := "password"
-	dbname := "ghosterz"
-	// Connection string
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+	// Set PQPASSWORD environment variable
+	os.Setenv("PQPASSWORD", viper.GetString("DB_PASSWORD"))
+
+	host := viper.GetString("DB_HOST")
+	port := viper.GetInt("DB_PORT")
+	user := viper.GetString("DB_USER")
+	password := viper.GetString("DB_PASSWORD")
+	dbname := viper.GetString("DB_NAME")
+
+	connURL := &url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(user, password),
+		Host:     fmt.Sprintf("%s:%d", host, port),
+		Path:     dbname,
+		RawQuery: "sslmode=disable",
+	}
+
+	connStr := connURL.String()
 
 	var err error
-	// Connect to the database
 	DB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
