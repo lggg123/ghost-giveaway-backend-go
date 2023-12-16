@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/lggg123/ghost-giveaway-backend-go/database"
-	// Update with the correct module path
-	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
 
@@ -28,7 +28,14 @@ func main() {
 
 	corsHandler := cors.Default().Handler(router)
 
-	port := 8080
-	log.Printf("Server is running on http://localhost:%d\n", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), corsHandler))
+	// Determine the port from the environment variable or default to 8080
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	http.ListenAndServe(":"+port, nil)
+
+	log.Printf("Server is running on http://localhost:%s\n", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), corsHandler))
 }

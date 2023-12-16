@@ -6,10 +6,11 @@ import (
 	"net/http"
 
 	"github.com/lggg123/ghost-giveaway-backend-go/database"
+	"github.com/lggg123/ghost-giveaway-backend-go/models"
 )
 
 func signupHandler(w http.ResponseWriter, r *http.Request) {
-	var user User
+	var user models.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

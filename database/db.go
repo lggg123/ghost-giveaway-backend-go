@@ -2,11 +2,10 @@
 package database
 
 import (
-	"fmt"
 	"log"
-	"net/url"
 	"os"
 
+	"github.com/lggg123/ghost-giveaway-backend-go/models"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
@@ -17,29 +16,10 @@ var DB *gorm.DB
 
 // InitDB initializes the database connection
 func InitDB() {
-	viper.SetConfigFile(".env")
+	connStr := os.Getenv("DATABASE_URL")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal("Error reading .env file")
 	}
-
-	// Set PQPASSWORD environment variable
-	os.Setenv("PQPASSWORD", viper.GetString("DB_PASSWORD"))
-
-	host := viper.GetString("DB_HOST")
-	port := viper.GetInt("DB_PORT")
-	user := viper.GetString("DB_USER")
-	password := viper.GetString("DB_PASSWORD")
-	dbname := viper.GetString("DB_NAME")
-
-	connURL := &url.URL{
-		Scheme:   "postgres",
-		User:     url.UserPassword(user, password),
-		Host:     fmt.Sprintf("%s:%d", host, port),
-		Path:     dbname,
-		RawQuery: "sslmode=disable",
-	}
-
-	connStr := connURL.String()
 
 	var err error
 	DB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
@@ -72,7 +52,7 @@ func CloseDB() {
 func MigrateDB() {
 	// Perform your database migrations here
 	models := []interface{}{
-		&User{},
+		&models.User{},
 		// Add other models as needed
 	}
 
