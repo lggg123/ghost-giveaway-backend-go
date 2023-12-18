@@ -2,12 +2,12 @@
 package database
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/lggg123/ghost-giveaway-backend-go/models"
 	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,10 +16,13 @@ var DB *gorm.DB
 
 // InitDB initializes the database connection
 func InitDB() {
-	connStr := os.Getenv("DATABASE_URL")
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("Error reading .env file")
-	}
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPassword, dbName)
 
 	var err error
 	DB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
