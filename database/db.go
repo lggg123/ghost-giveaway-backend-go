@@ -2,7 +2,6 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -10,19 +9,25 @@ import (
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"net/url"
 )
 
 var DB *gorm.DB
 
 // InitDB initializes the database connection
 func InitDB() {
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		log.Fatal("DATABASE_URL must be set")
+	}
 
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPassword, dbName)
+	connURL, parseErr := url.Parse(dbURL)
+	if parseErr != nil {
+		log.Fatal("Error parsing DATABASE_URL: ", parseErr)
+	}
+
+	connStr := connURL.String()
 
 	var err error
 	DB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})

@@ -8,17 +8,11 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	"github.com/lggg123/ghost-giveaway-backend-go/database"
 	"github.com/rs/cors"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	database.InitDB()
 	defer database.CloseDB()
 	database.MigrateDB()
