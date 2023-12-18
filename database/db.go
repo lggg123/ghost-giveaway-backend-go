@@ -17,6 +17,12 @@ var DB *gorm.DB
 
 // InitDB initializes the database connection
 func InitDB() {
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		log.Fatal("DATABASE_URL must be set")
