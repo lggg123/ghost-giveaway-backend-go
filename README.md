@@ -10,5 +10,4 @@ Go and the packages on it. (hint: run `go get` in the terminal to install all de
 
 make sure you have the databse properly configured to run
 
-simply clone the application and then in the directory of the application run
-in the terminal `go build` and `go run .` the server should be running appropriately
+simply clone the application and then follow the instructions on heroku to deploy and test out using my frontend or the frontend of your choice (ghosters.vercel.app).
