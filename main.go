@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-
 	database.InitDB()
 	defer database.CloseDB()
 	database.MigrateDB()

@@ -1,13 +1,12 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	"net/url"
+	"os"
 
 	"github.com/lggg123/ghost-giveaway-backend-go/models"
 	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,18 +15,20 @@ var DB *gorm.DB
 
 // InitDB initializes the database connection
 func InitDB() {
-	host := viper.GetString("DB_HOST")
-	port := viper.GetInt("DB_PORT")
-	user := viper.GetString("DB_USER")
-	password := viper.GetString("DB_PASSWORD")
-	dbname := viper.GetString("DB_NAME")
+	port := os.Getenv("PORT")
 
-	connURL := &url.URL{
-		Scheme:   "postgres",
-		User:     url.UserPassword(user, password),
-		Host:     fmt.Sprintf("%s:%d", host, port),
-		Path:     dbname,
-		RawQuery: "sslmode=disable",
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		log.Fatal("DATABASE_URL must be set")
+	}
+
+	connURL, parseErr := url.Parse(dbURL)
+	if parseErr != nil {
+		log.Fatal("Error parsing DATABASE_URL: ", parseErr)
 	}
 
 	connStr := connURL.String()
