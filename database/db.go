@@ -1,46 +1,51 @@
-// database/db.go
 package database
 
 import (
+	"fmt"
 	"log"
+	"net/url"
 	"os"
 
 	"github.com/lggg123/ghost-giveaway-backend-go/models"
 	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"net/url"
 )
 
 var DB *gorm.DB
 
 // InitDB initializes the database connection
 func InitDB() {
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		log.Fatal("$PORT must be set")
+	viper.SetConfigFile(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal("Error reading .env file")
 	}
 
-	dbURL := os.Getenv("DATABASE_URL")
-	if dbURL == "" {
-		log.Fatal("DATABASE_URL must be set")
-	}
+	// Set PQPASSWORD environment variable
+	os.Setenv("PQPASSWORD", viper.GetString("DB_PASSWORD"))
 
-	connURL, parseErr := url.Parse(dbURL)
-	if parseErr != nil {
-		log.Fatal("Error parsing DATABASE_URL: ", parseErr)
+	host := viper.GetString("DB_HOST")
+	port := viper.GetInt("DB_PORT")
+	user := viper.GetString("DB_USER")
+	password := viper.GetString("DB_PASSWORD")
+	dbname := viper.GetString("DB_NAME")
+
+	connURL := &url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(user, password),
+		Host:     fmt.Sprintf("%s:%d", host, port),
+		Path:     dbname,
+		RawQuery: "sslmode=disable",
 	}
 
 	connStr := connURL.String()
-
 	var err error
+	// Connect to the database
 	DB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	// Check the connection
 	sqlDB, err := DB.DB()
 	if err != nil {
@@ -50,7 +55,6 @@ func InitDB() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	log.Println("Connected to the database")
 }
 
