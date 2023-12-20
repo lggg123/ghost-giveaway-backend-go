@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/url"
-	"os"
 
 	"github.com/lggg123/ghost-giveaway-backend-go/models"
 	_ "github.com/lib/pq"
@@ -17,14 +16,6 @@ var DB *gorm.DB
 
 // InitDB initializes the database connection
 func InitDB() {
-	viper.SetConfigFile(".env")
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("Error reading .env file")
-	}
-
-	// Set PQPASSWORD environment variable
-	os.Setenv("PQPASSWORD", viper.GetString("DB_PASSWORD"))
-
 	host := viper.GetString("DB_HOST")
 	port := viper.GetInt("DB_PORT")
 	user := viper.GetString("DB_USER")
